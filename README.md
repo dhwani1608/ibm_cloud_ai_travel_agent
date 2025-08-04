@@ -1,17 +1,24 @@
 # ibm_cloud_ai_travel_agent
-##AI Travel Planner Agent ✈️
+## AI Travel Planner Agent ✈️
+
 This project is an AI-powered travel assistant developed as part of the IBM Cloud Internship. The agent helps users plan trips efficiently by generating personalized itineraries based on natural language requests. It leverages the power of IBM's Granite Large Language Model (LLM) hosted on the watsonx.ai platform.
 
-##📝 Project Overview
+### 📝 Project Overview
 Planning a trip can be overwhelming. Users often spend hours searching multiple websites for flights, hotels, and activities, leading to information overload. This AI Travel Planner Agent simplifies this process into a single, conversational interface. A user can describe their ideal trip—including destination, duration, budget, and interests—and the agent will generate a complete, day-by-day itinerary.
 
-##✨ Key Features
-Natural Language Input: Understands user requests in plain English.
+### ✨ Key Features
+* **Natural Language Input**: Understands user requests in plain English.
+* **Personalized Itineraries**: Generates custom travel plans tailored to user preferences.
+* **Powered by IBM Granite**: Utilizes a state-of-the-art Large Language Model from IBM for reasoning and plan generation.
+* **Web-Based UI**: A modern, cheerful, and easy-to-use frontend for seamless interaction.
+* **Local Backend Proxy**: A secure local server to handle API requests and protect credentials.
 
-Personalized Itineraries: Generates custom travel plans tailored to user preferences.
+### 🏛️ Architecture
+The application runs with a simple and secure local architecture. The frontend communicates with a local Python server, which acts as a proxy to securely interact with the IBM watsonx.ai API.
 
-Powered by IBM Granite: Utilizes a state-of-the-art Large Language Model from IBM for reasoning and plan generation.
-
-Web-Based UI: A modern, cheerful, and easy-to-use frontend for seamless interaction.
-
-Local Backend Proxy: A secure local server to handle API requests and protect credentials.
+```mermaid
+graph TD
+    A[Frontend Browser - index.html] -- API Request --> B[Local Python Server - proxy_app.py];
+    B -- Authenticates & Forwards Request --> C[IBM Watsonx.ai API];
+    C -- AI-Generated Itinerary --> B;
+    B -- Forwards Response --> A;
