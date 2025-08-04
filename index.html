@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Travel Planner</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #0d1b2a; /* Deep Teal/Navy */
+            --secondary-color: #e0e1dd; /* Light Gray */
+            --accent-color: #ff6b6b; /* Cheerful Coral */
+            --text-color: #495057;
+            --bg-color: #f8f9fa;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.7;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        .container {
+            max-width: 700px;
+            width: 100%;
+            text-align: center;
+        }
+
+        header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 8px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            margin-bottom: 30px;
+            color: var(--text-color);
+        }
+
+        .input-card {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            margin-bottom: 30px;
+        }
+
+        textarea {
+            width: 100%;
+            min-height: 120px;
+            padding: 15px;
+            border-radius: 12px;
+            border: 2px solid var(--secondary-color);
+            font-family: 'Poppins', sans-serif;
+            font-size: 1rem;
+            resize: vertical;
+            transition: border-color 0.3s ease;
+        }
+
+        textarea:focus {
+            outline: none;
+            border-color: var(--accent-color);
+        }
+
+        button {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            padding: 15px 20px;
+            margin-top: 15px;
+            background: linear-gradient(45deg, var(--accent-color), #ff8787);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        button svg {
+            margin-left: 10px;
+            width: 24px;
+            height: 24px;
+        }
+        
+        button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(255, 107, 107, 0.4);
+        }
+
+        button:disabled {
+            background: #b0b0b0;
+            cursor: not-allowed;
+        }
+
+        #result-container {
+            background: #ffffff;
+            padding: 30px;
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            text-align: left;
+            min-height: 150px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #6c757d;
+        }
+        
+        /* Loading Spinner */
+        .loader {
+            border: 5px solid var(--secondary-color);
+            border-top: 5px solid var(--accent-color);
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>AI Travel Planner ✨</h1>
+            <p>Your next adventure begins with a simple sentence. Let's create your dream itinerary!</p>
+        </header>
+
+        <div class="input-card">
+            <textarea id="userInput" placeholder="e.g., Plan a 7-day trip to Japan for cherry blossom season. I love food, temples, and technology..."></textarea>
+            <button id="submitBtn" onclick="getPlan()">
+                Create My Trip
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M6 12L3.269 3.126A59.768 59.768 0 0121.485 12 59.77 59.77 0 013.27 20.876L5.999 12zm0 0h7.5" />
+                </svg>
+            </button>
+        </div>
+
+        <div id="result-container">
+            <span>Your personalized itinerary will appear here...</span>
+        </div>
+    </div>
+
+    <script>
+        const submitBtn = document.getElementById('submitBtn');
+        const userInput = document.getElementById('userInput');
+        const resultContainer = document.getElementById('result-container');
+
+        async function getPlan() {
+            const query = userInput.value;
+            if (!query.trim()) {
+                alert("Please describe your dream trip first!");
+                return;
+            }
+
+            // --- Update UI for loading state ---
+            submitBtn.disabled = true;
+            resultContainer.innerHTML = '<div class="loader"></div>';
+            resultContainer.style.alignItems = 'center';
+
+            // --- API Call ---
+            // IMPORTANT: Replace this with your actual deployed agent's URL
+            const apiUrl = 'http://127.0.0.1:5000/api/get-plan';
+
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ query: query }),
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Network response was not ok: ${response.statusText}`);
+                }
+                
+                const planText = await response.text();
+                
+                // --- Display the final result ---
+                resultContainer.innerText = planText;
+                resultContainer.style.alignItems = 'flex-start'; // Align text to top
+
+            } catch (error) {
+                console.error("Error fetching plan:", error);
+                resultContainer.innerText = 'Sorry, an unexpected error occurred. Please check the console or try again later.';
+                resultContainer.style.alignItems = 'center';
+            } finally {
+                // --- Revert UI to normal state ---
+                submitBtn.disabled = false;
+            }
+        }
+    </script>
+
+</body>
+</html>
